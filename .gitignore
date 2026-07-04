@@ -1,0 +1,14 @@
+# Binaries
+/miniclean
+/miniclean.exe
+/bin/
+/dist/
+
+# Test artifacts
+*.out
+coverage.html
+
+# Editor
+.vscode/
+.idea/
+*.swp
