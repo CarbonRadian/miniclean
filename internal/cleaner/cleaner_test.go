@@ -102,6 +102,16 @@ func TestNormalizeHeaders(t *testing.T) {
 	}
 }
 
+func TestNormalizeHeadersDedupesCollisions(t *testing.T) {
+	tb := table([]string{"Name", "Name", "name_2", "name"})
+	NormalizeHeaders(tb)
+
+	want := []string{"name", "name_2", "name_2_2", "name_3"}
+	if !reflect.DeepEqual(tb.Header, want) {
+		t.Errorf("header = %q, want %q", tb.Header, want)
+	}
+}
+
 func TestNormalizeNulls(t *testing.T) {
 	tb := table(
 		[]string{"a", "b", "c"},

@@ -4,7 +4,10 @@
 // and cleaning is expressed as a pipeline of Rules applied in order.
 package cleaner
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // Table is an in-memory representation of tabular data.
 // All cells are strings; type interpretation is left to consumers.
@@ -73,9 +76,21 @@ func DedupRows(t *Table) {
 
 // NormalizeHeaders lowercases headers and replaces runs of spaces and
 // dashes with a single underscore, producing snake_case-style names.
+// If normalization makes two or more headers collide, later ones get a
+// numeric suffix (_2, _3, ...) so headers stay unique.
 func NormalizeHeaders(t *Table) {
+	used := make(map[string]struct{}, len(t.Header))
 	for i, h := range t.Header {
-		t.Header[i] = normalizeHeader(h)
+		base := normalizeHeader(h)
+		name := base
+		for n := 2; ; n++ {
+			if _, taken := used[name]; !taken {
+				break
+			}
+			name = fmt.Sprintf("%s_%d", base, n)
+		}
+		used[name] = struct{}{}
+		t.Header[i] = name
 	}
 }
 
